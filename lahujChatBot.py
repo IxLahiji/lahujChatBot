@@ -42,7 +42,7 @@ def remove_emojii(text):
 
 
 def response_roll():
-        return (randint(0,100) < int(settings.get_setting('Source channel')))
+        return (randint(0,100) <= int(settings.get_setting('Source channel')))
         
         
 def safe_print(text):
@@ -82,8 +82,8 @@ async def on_message(message):
         if ((message.channel.name == target_channel_name) and (message.author.id != client.user.id)):
             last_recieved = datetime.datetime.now()
             sentence = await generate_sentence()
-            if ()
-            await client.send_message(find_channel(target_channel_name), sentence)
+            if (start_last_recieved == last_recieved):
+                await client.send_message(find_channel(target_channel_name), sentence)
             #safe_print (await generate_sentence())
 
 
