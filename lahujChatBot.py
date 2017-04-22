@@ -14,7 +14,8 @@ prog_path = os.path.dirname(os.path.abspath(__file__))
 default_settings = {"Discord token": "",
                     "Source channel": "",
                     "Target channel": "",
-                    "Response frequency (%)": "25"
+                    "Response frequency (%)": "25",
+                    "Chat idle allowed": "10"
                     }
 
 #Load information
@@ -41,6 +42,14 @@ def remove_emojii(text):
         return emoji_pattern.sub(r'', text)
 
 
+async def auto_message_check():
+    global last_recieved
+    while True:
+        if ((datetime.datetime.now() - (last_recieved + datetime.timedelta(minutes=int(settings.get_setting('Chat idle allowed'))))).days >= 0):
+            asyncio.ensure_future(send_response())
+        await asyncio.sleep(30)
+        
+        
 def response_roll():
     x = random.randint(0,100)
     return (x <= int(settings.get_setting('Response frequency (%)')))
@@ -73,21 +82,24 @@ async def generate_sentence ():
     
     return new_sentence
 
-
+    
+async def send_response():
+    global last_recieved
+    target_channel_name = settings.get_setting('Target channel')
+    last_recieved = datetime.datetime.now()
+    start_last_recieved = last_recieved
+    
+    sentence = await generate_sentence()
+    if (start_last_recieved == last_recieved):
+        await client.send_message(find_channel(target_channel_name), sentence)
+    
     
 @client.event
 async def on_message(message):
-    global last_recieved
     target_channel_name = settings.get_setting('Target channel')
-    if (response_roll()):
-        if ((message.channel.name == target_channel_name) and (message.author.id != client.user.id)):
-            last_recieved = datetime.datetime.now()
-            start_last_recieved = last_recieved
-            
-            sentence = await generate_sentence()
-            if (start_last_recieved == last_recieved):
-                await client.send_message(find_channel(target_channel_name), sentence)
-            #safe_print (await generate_sentence())
+    if ((message.channel.name == target_channel_name) and (message.author.id != client.user.id)):
+        if (response_roll()):
+            asyncio.ensure_future(send_response())
 
 
 @client.event
@@ -106,7 +118,10 @@ try:
         time.sleep(3)
         sys.exit()
     else:
-        client.loop.run_until_complete(client.start(settings.get_setting('Discord token')))
+        client.loop.run_until_complete(asyncio.gather(
+                client.start(settings.get_setting('Discord token')),
+                auto_message_check()
+                ))
     
 except KeyboardInterrupt:
     #Set exit flag to allow wakeup() to close properly
