@@ -15,7 +15,9 @@ default_settings = {"Discord token": "",
                     "Source channel": "",
                     "Target channel": "",
                     "Response frequency (%)": "25",
-                    "Chat idle allowed": "10"
+                    "Chat idle allowed (m)": "10",
+                    "Markov state size": "5",
+                    "Sample size": "3000"
                     }
 
 #Load information
@@ -45,9 +47,9 @@ def remove_emojii(text):
 async def auto_message_check():
     global last_recieved
     while True:
-        if ((datetime.datetime.now() - (last_recieved + datetime.timedelta(minutes=int(settings.get_setting('Chat idle allowed'))))).days >= 0):
+        if ((datetime.datetime.now() - (last_recieved + datetime.timedelta(minutes=int(settings.get_setting('Chat idle allowed (m)'))))).days >= 0):
             asyncio.ensure_future(send_response())
-        await asyncio.sleep(30)
+        await asyncio.sleep(10)
         
         
 def response_roll():
@@ -67,14 +69,14 @@ def find_channel(target_channel_name):
 async def retrieve_source_text():
     target_channel = find_channel(settings.get_setting('Source channel'))
     text = ""
-    async for message in client.logs_from(target_channel, limit=5000):
+    async for message in client.logs_from(target_channel, limit=int(settings.get_setting('Sample size'))):
             text += message.content + "\n"
     return text
 
 
 async def generate_sentence ():
     source_text = await retrieve_source_text()
-    text_model = markovify.NewlineText(source_text)
+    text_model = markovify.NewlineText(source_text, state_size=int(settings.get_setting('Markov state size')))
     
     new_sentence = None
     while not new_sentence:
