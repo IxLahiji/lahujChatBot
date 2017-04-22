@@ -23,7 +23,7 @@ settings = JSONSettings(prog_path, default_settings)
 #Create new discord client
 client = discord.Client()
 
-last_recieved = datetime.datetime.now()
+last_recieved = datetime.datetime.now()
 
 def remove_emojii(text):
         emoji_pattern = re.compile("["
@@ -42,7 +42,8 @@ def remove_emojii(text):
 
 
 def response_roll():
-        return (randint(0,100) <= int(settings.get_setting('Source channel')))
+    x = random.randint(0,100)
+    return (x <= int(settings.get_setting('Response frequency (%)')))
         
         
 def safe_print(text):
@@ -76,11 +77,13 @@ async def generate_sentence ():
     
 @client.event
 async def on_message(message):
+    global last_recieved
     target_channel_name = settings.get_setting('Target channel')
-    start_last_recieved = last_recieved
     if (response_roll()):
         if ((message.channel.name == target_channel_name) and (message.author.id != client.user.id)):
             last_recieved = datetime.datetime.now()
+            start_last_recieved = last_recieved
+            
             sentence = await generate_sentence()
             if (start_last_recieved == last_recieved):
                 await client.send_message(find_channel(target_channel_name), sentence)
