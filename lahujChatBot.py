@@ -46,6 +46,12 @@ def remove_emojii(text):
 
 
 def remove_mentions(text):
+    convert_dict = {
+            '@\u200beveryone': '@everyone',
+            '@\u200bhere': '@here'
+        }
+    text = str(text.translate(convert_dict))
+    
     mentions = re.findall(r'<@!?([0-9]+)>', text)
     for mention in mentions:
         member = find(lambda m: str(m.id) == str(mention), find_channel(settings.get_setting('Target channel').server.members))
