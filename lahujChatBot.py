@@ -54,7 +54,7 @@ def remove_mentions(text):
     
     mentions = re.findall(r'<@!?([0-9]+)>', text)
     for mention in mentions:
-        member = discord.utils.find(lambda m: str(m.id) == str(mention), find_channel(settings.get_setting('Target channel').server.members))
+        member = discord.utils.find(lambda m: str(m.id) == str(mention), find_channel(settings.get_setting('Target channel')).server.members)
         if (member is not None):
             text = text.replace(mention, "-" + member.name)
     return text
