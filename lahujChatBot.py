@@ -102,7 +102,7 @@ async def generate_sentence ():
     while not new_sentence:
         new_sentence = text_model.make_sentence()
     
-    if (get_setting('Allow Mentions') != "true"):
+    if (settings.get_setting('Allow Mentions') != "true"):
         new_sentence = remove_mentions(new_sentence)
     
     return new_sentence
