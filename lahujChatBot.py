@@ -78,15 +78,16 @@ def find_channel(target_channel_name):
 
 async def retrieve_source_text():
     source = settings.get_setting('Source')
+    source_text = ""
     if (settings.get_setting('Source type (channel or user)') == "channel"):
-        text = ""
         for channel in source:
             target_channel = find_channel(channel)        
             async for message in client.logs_from(target_channel, limit=int(settings.get_setting('Sample size per source'))):
-                    text += message.content + "\n"
-            return text
+                    source_text += message.content + "\n"
+            return source_text
     elif(settings.get_setting('Source type (channel or user)') == "user"):
-        pass
+        for user in source:
+            pass
     else:
         print("Error: Invalid source type! Please choose either 'channel' or 'user' in settings file.")
         time.sleep(3)
