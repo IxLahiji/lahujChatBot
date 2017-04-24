@@ -12,12 +12,13 @@ from chatBot.settings import JSONSettings
 prog_path = os.path.dirname(os.path.abspath(__file__))
 
 default_settings = {"Discord token": "",
-                    "Source channel": "",
+                    "Source type (channel or user)": "",
+                    "Source": [""],
                     "Target channel": "",
                     "Response frequency (%)": "25",
                     "Chat idle allowed (m)": "10",
-                    "Markov state size": "5",
-                    "Sample size": "3000"
+                    "Sample size per source": "10000",
+                    "Allow Mentions": "false"
                     }
 
 #Load information
@@ -44,6 +45,14 @@ def remove_emojii(text):
         return emoji_pattern.sub(r'', text)
 
 
+def remove_mentions():
+    mentions = re.findall(r'<@!?([0-9]+)>', self.content)
+    for mention in mentions:
+        member = find(lambda m: str(m.id) == str(mention), find_channel(settings.get_setting('Target channel').server.members)
+        if (not (member is None)):
+            str.replace(mention, "-" + member.name)
+
+
 async def auto_message_check():
     global last_recieved
     while True:
@@ -67,16 +76,26 @@ def find_channel(target_channel_name):
 
 
 async def retrieve_source_text():
-    target_channel = find_channel(settings.get_setting('Source channel'))
-    text = ""
-    async for message in client.logs_from(target_channel, limit=int(settings.get_setting('Sample size'))):
-            text += message.content + "\n"
-    return text
+    source = settings.get_setting('Source')
+    if (settings.get_setting('Source type (channel or user)') == "channel"):
+        
+        text = ""
+        for channel in source:
+            target_channel = find_channel(channel)        
+            async for message in client.logs_from(target_channel, limit=int(settings.get_setting('Sample size per source'))):
+                    text += message.content + "\n"
+            return text
+    elif(settings.get_setting('Source type (channel or user)') == "user"):
+        pass
+    else:
+        print("Error: Invalid source type! Please choose either 'channel' or 'user' in settings file.")
+        time.sleep(3)
+        sys.exit()
 
 
 async def generate_sentence ():
     source_text = await retrieve_source_text()
-    text_model = markovify.NewlineText(source_text, state_size=int(settings.get_setting('Markov state size')))
+    text_model = markovify.NewlineText(source_text)
     
     new_sentence = None
     while not new_sentence:
