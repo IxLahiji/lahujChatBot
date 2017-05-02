@@ -1,5 +1,5 @@
 import itertools
-import numpy
+import numpy as np
 
 class TextProfile:
     
@@ -36,4 +36,31 @@ class TextProfile:
         self.profile = new_profile
     
     def generate_sentence(self):
-        pass
+        new_sentence = []
+        
+        curr_word = self.choose_word(self.new_sentence_init_profile)
+        
+        while curr_word is not None:
+            new_sentence.append(curr_word)
+            curr_word = choose_word(self.profile[curr_word])
+            
+        return new_sentence
+    
+    def choose_word(self, word_dict):
+        words = list(word_dict.keys())
+        weights = list(word_dict.values())
+        
+        total = np.sum(weights)
+        weights[:] = [x / total for x in weights]
+        
+        return np.random.choice(words, p=weights)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
