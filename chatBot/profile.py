@@ -19,7 +19,7 @@ class TextProfile:
             if len(sentence_list) < 1:
                 continue
                 
-            first_word = sentence_list[0].lower()
+            first_word = self.make_lower(sentence_list[0])
             if (first_word not in new_sentence_init_profile):
                     new_sentence_init_profile[first_word] = 0
             new_sentence_init_profile[first_word] += 1
@@ -43,12 +43,12 @@ class TextProfile:
         new_sentence = []
         
         curr_word = self.choose_word(self.sentence_init_profile)
-        curr_word[0] = curr_word[0].upper()
         
         while curr_word is not None:
             new_sentence.append(curr_word)
             curr_word = self.choose_word(self.profile[curr_word])
             
+        new_sentence[0] = new_sentence[0][0].upper() + new_sentence[0][1:]
         return (' '.join (word for word in new_sentence))
     
     def choose_word(self, word_dict):
