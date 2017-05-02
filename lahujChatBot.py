@@ -103,10 +103,8 @@ async def retrieve_source_text():
 
 async def generate_sentence ():
     source_text = await retrieve_source_text()
-    print("Creating text profile...")
-    text_model = TextProfile(source_text)    print("Generating sentence...")
+    text_model = TextProfile(source_text)
     new_sentence = text_model.generate_sentence()
-    print("Sending message...")
     if (settings.get_setting('Allow Mentions') != "true"):
         new_sentence = remove_mentions(new_sentence)
     

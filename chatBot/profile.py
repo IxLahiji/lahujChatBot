@@ -16,6 +16,9 @@ class TextProfile:
         for sentence in self.source_list:
             sentence_list = sentence.split()
             
+            if len(sentence_list) < 1:
+                continue
+                
             first_word = sentence_list[0].lower()
             if (first_word not in new_sentence_init_profile):
                     new_sentence_init_profile[first_word] = 0
@@ -23,7 +26,8 @@ class TextProfile:
             
             for curr_word, next_word in itertools.zip_longest(sentence_list, sentence_list[1:]):
                 curr_word = curr_word.lower()
-                next_word = next_word.lower()
+                if next_word is not None:
+                    next_word = next_word.lower()
                 
                 if (curr_word not in new_profile):
                     new_profile[curr_word] = {}
@@ -39,13 +43,13 @@ class TextProfile:
     def generate_sentence(self):
         new_sentence = []
         
-        curr_word = self.choose_word(self.new_sentence_init_profile)
+        curr_word = self.choose_word(self.sentence_init_profile)
         
         while curr_word is not None:
             new_sentence.append(curr_word)
-            curr_word = choose_word(self.profile[curr_word])
+            curr_word = self.choose_word(self.profile[curr_word])
             
-        return new_sentence
+        return (' '.join (word for word in new_sentence))
     
     def choose_word(self, word_dict):
         words = list(word_dict.keys())
