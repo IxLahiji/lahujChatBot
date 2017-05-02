@@ -1,6 +1,7 @@
 import itertools
 import numpy as np
 
+
 class TextProfile:
     
     def __init__(self, text_list):

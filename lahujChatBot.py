@@ -7,6 +7,7 @@ import markovify
 import random
 import datetime
 from chatBot.settings import JSONSettings
+from chatBot.profile import TextProfile
 
 
 prog_path = os.path.dirname(os.path.abspath(__file__))
@@ -21,7 +22,7 @@ default_settings = {"Discord token": "",
                     "Allow Mentions": "false"
                     }
 
-#Load information
+#Load settings
 settings = JSONSettings(prog_path, default_settings)
 
 #Create new discord client
@@ -84,12 +85,12 @@ def find_channel(target_channel_name):
 
 async def retrieve_source_text():
     source = settings.get_setting('Source')
-    source_text = ""
+    source_text = []
     if (settings.get_setting('Source type (channel or user)') == "channel"):
         for channel in source:
             target_channel = find_channel(channel)        
             async for message in client.logs_from(target_channel, limit=int(settings.get_setting('Sample size per source'))):
-                    source_text += message.content + "\n"
+                    source_text.append(message.content)
             return source_text
     elif(settings.get_setting('Source type (channel or user)') == "user"):
         for user in source:
@@ -102,12 +103,10 @@ async def retrieve_source_text():
 
 async def generate_sentence ():
     source_text = await retrieve_source_text()
-    text_model = markovify.NewlineText(source_text)
-    
-    new_sentence = None
-    while not new_sentence:
-        new_sentence = text_model.make_sentence()
-    
+    print("Creating text profile...")
+    text_model = TextProfile(source_text)    print("Generating sentence...")
+    new_sentence = text_model.generate_sentence()
+    print("Sending message...")
     if (settings.get_setting('Allow Mentions') != "true"):
         new_sentence = remove_mentions(new_sentence)
     
