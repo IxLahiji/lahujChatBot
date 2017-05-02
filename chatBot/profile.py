@@ -25,9 +25,8 @@ class TextProfile:
             new_sentence_init_profile[first_word] += 1
             
             for curr_word, next_word in itertools.zip_longest(sentence_list, sentence_list[1:]):
-                curr_word = curr_word.lower()
-                if next_word is not None:
-                    next_word = next_word.lower()
+                curr_word = self.make_lower(curr_word)
+                next_word = self.make_lower(next_word)
                 
                 if (curr_word not in new_profile):
                     new_profile[curr_word] = {}
@@ -44,6 +43,7 @@ class TextProfile:
         new_sentence = []
         
         curr_word = self.choose_word(self.sentence_init_profile)
+        curr_word[0] = curr_word[0].upper()
         
         while curr_word is not None:
             new_sentence.append(curr_word)
@@ -61,7 +61,11 @@ class TextProfile:
         return np.random.choice(words, p=weights)
         
         
-        
+    def make_lower(self, text):
+        if ((text is not None) and ("http" not in text)):
+            return text.lower()
+        else:
+            return text
         
         
         
