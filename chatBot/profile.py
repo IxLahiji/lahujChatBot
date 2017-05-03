@@ -19,7 +19,7 @@ class TextProfile:
             if len(sentence_list) < 1:
                 continue
                 
-            first_word = self.make_lower(sentence_list[0])
+            first_word = sentence_list[0]
             if (first_word not in new_sentence_init_profile):
                     new_sentence_init_profile[first_word] = 0
             new_sentence_init_profile[first_word] += 1
@@ -46,10 +46,8 @@ class TextProfile:
         
         while curr_word is not None:
             new_sentence.append(curr_word)
-            curr_word = self.choose_word(self.profile[curr_word])
+            curr_word = self.choose_word(self.profile[self.make_lower(curr_word)])
             
-        if ("http" not in new_sentence[0]):
-            new_sentence[0] = new_sentence[0][0].upper() + new_sentence[0][1:]
         return (' '.join (word for word in new_sentence))
     
     def choose_word(self, word_dict):
