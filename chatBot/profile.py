@@ -48,7 +48,8 @@ class TextProfile:
             new_sentence.append(curr_word)
             curr_word = self.choose_word(self.profile[curr_word])
             
-        new_sentence[0] = new_sentence[0][0].upper() + new_sentence[0][1:]
+        if ("http" not in new_sentence[0]):
+            new_sentence[0] = new_sentence[0][0].upper() + new_sentence[0][1:]
         return (' '.join (word for word in new_sentence))
     
     def choose_word(self, word_dict):
